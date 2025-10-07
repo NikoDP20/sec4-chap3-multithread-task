@@ -17,7 +17,21 @@ public class DonationTask extends RecursiveTask<Long> {
     @Override
     protected Long compute() {
         //TODO: implement fork/join logic
-        return null;
+        if (end - start <= THRESHOLD) {
+            long sum = 0;
+            for (int i = start; i < end; i++) {
+                sum += listDonations[i];
+            }
+            return sum;
+        } else {
+            int mid = (start + end) / 2;
+            DonationTask leftTask = new DonationTask(listDonations, start, mid);
+            DonationTask rightTask = new DonationTask(listDonations, mid, end);
+            leftTask.fork();
+            long rightResult = rightTask.compute();
+            long leftResult = leftTask.join();
+            return leftResult + rightResult;
+        }
     }
 
 }
